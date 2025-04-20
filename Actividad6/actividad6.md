@@ -234,7 +234,7 @@ En esta fase, es posible que algunas funcionalidades estén listas para ser most
 
 **Pregunta:** ¿Cómo ayuda `git cherry-pick` a mostrar avances de forma selectiva en un sprint review?
 - Permite llevar solo los commits que están completos a `main` sin tener que fusionar ramas enteras que tienen partes en desarrollo.
-- Esto es útil para la revisión del sprint, ya que el equipo puede mostrar avances reales sin comprometer estabilidad ni fusionar código incompleto. También facilita que el equipo de QA o los stakeholders prueben algo funcional, mientras el resto del trabajo sigue aún en progreso.
+- Esto es útil para la revisión del sprint, ya que el equipo puede mostrar avances funcionales sin comprometer estabilidad ni fusionar código incompleto. También facilita que el equipo de QA o los stakeholders prueben algo funcional, mientras el resto del trabajo sigue aún en progreso.
 
 #### **Fase 4: Retrospectiva del sprint (sprint retrospective)**
 
@@ -296,11 +296,361 @@ En un entorno CI, es común automatizar ciertas operaciones de Git para asegurar
 	- Historial lineal:  Es más fácil de entender que el historial no lineal creado por  `git merge`, lo cual facilita los merges a producción.
 	- Depuración simplificada: Rastrear cuándo se introdujo un error en particular se vuelve más fácil.
 	- Higiene del código: El rebasing te anima a aplastar commits de corrección o dividir commits más grandes, reduce conflictos posteriores porque siempre trabajas con lo más actualizado de `main`.
- 
-**Desventajas:**
-- Conflictos para los colaboradores sino están familiarizados.
-- Fusiones complejas en caso una rama pública ha sido rebased y se ha alterado el historial.
-- Pérdida de contexto al aplatas commits.
+	
+- **Desventajas:**
+	- Conflictos para los colaboradores sino están familiarizados.
+	- Fusiones complejas en caso una rama pública ha sido rebased y se ha alterado el historial.
+	- Pérdida de contexto al aplatas commits.
 ---
 
 ### **Navegando conflictos y versionado en un entorno devOps**
+**Objetivo:**  
+Gestionar conflictos en Git, realizar fusiones complejas, utilizar herramientas para comparar y resolver conflictos, aplicar buenas prácticas en el manejo del historial de versiones  y usar el versionado semántico en un entorno de integración continua (CI).
+#### **Ejemplo:**
+
+1. **Inicialización del proyecto y creación de ramas**
+
+   - **Paso 1**: Crea un nuevo proyecto en tu máquina local.
+     ```bash
+     $ mkdir proyecto-colaborativo
+     $ cd proyecto-colaborativo
+     ```
+   - **Paso 2**: Inicializa Git en tu proyecto.
+     ```bash
+     $ git init
+     ```
+   - **Paso 3**: Crea un archivo de texto llamado `archivo_colaborativo.txt` y agrega algún contenido inicial.
+     ```bash
+     $ echo "Este es el contenido inicial del proyecto" > archivo_colaborativo.txt
+     ```
+   - **Paso 4**: Agrega el archivo al área de staging y haz el primer commit.
+     ```bash
+     $ git add .
+     $ git commit -m "Commit inicial con contenido base"
+     ```
+   - **Paso 5**: Crea dos ramas activas: main y feature-branch.
+     ```bash
+     $ git branch feature-branch  # Crear una nueva rama
+     ```
+   - **Paso 6**: Haz checkout a la rama feature-branch y realiza un cambio en el archivo `archivo_colaborativo.txt`.
+     ```bash
+     $ git checkout feature-branch
+     $ echo "Este es un cambio en la feature-branch" >> archivo_colaborativo.txt
+     $ git add .
+     $ git commit -m "Cambios en feature-branch"
+     ```
+   - **Paso 7**: Regresa a la rama main y realiza otro cambio en la misma línea del archivo `archivo_colaborativo.txt`.
+     ```bash
+     $ git checkout main
+     $ echo "Este es un cambio en la rama main" >> archivo_colaborativo.txt
+     $ git add .
+     $ git commit -m "Cambios en main"
+     ```
+   <div align="center">
+      <img src="https://i.postimg.cc/mDm1Skpr/6-18.png" alt="Parte4-1" width="600" />
+   </div>
+
+
+2. **Fusión y resolución de conflictos**
+
+   - **Paso 1**: Intenta fusionar feature-branch en main. Se espera que surjan conflictos de fusión.
+     ```bash
+     $ git merge feature-branch
+     ```
+   - **Paso 2**: Usa `git status` para identificar los archivos en conflicto. Examina los archivos afectados y resuelve manualmente los conflictos, conservando las líneas de código más relevantes para el proyecto.
+     ```bash
+     $ git status
+     $ git checkout --theirs <archivo>  # Si decides aceptar los cambios de feature-branch
+     $ git checkout --ours <archivo>    # Si decides aceptar los cambios de main
+     ```
+   - **Paso 3**: Una vez resueltos los conflictos, commitea los archivos y termina la fusión
+     ```bash
+     $ git add .
+     $ git commit -m "Conflictos resueltos"
+     ```
+   <div align="center">
+      <img src="https://i.postimg.cc/brMGKMhc/6-19.png" alt="Parte4-2" width="600" />
+   </div>
+3. **Simulación de fusiones y uso de git diff**
+
+   - **Paso 1**: Simula una fusión usando `git merge --no-commit --no-ff` para ver cómo se comportarían los cambios antes de realizar el commit.
+     ```bash
+     $ git merge --no-commit --no-ff feature-branch
+     $ git diff --cached  # Ver los cambios en el área de staging
+     $ git merge --abort  # Abortar la fusión si no es lo que se esperaba
+     ```
+   <div align="center">
+      <img src="https://i.postimg.cc/d373mBTW/6-20.png" alt="Parte4-3" width="600" />
+   </div>
+4. **Uso de git mergetool**
+
+   - **Paso 1**: Configura git mergetool con una herramienta de fusión visual (puedes usar meld, vimdiff, o Visual Studio Code).
+     ```bash
+     $ git config --global merge.tool <nombre-herramienta>
+     $ git mergetool
+     ```
+   - **Paso 2**: Usa la herramienta gráfica para resolver un conflicto de fusión.
+    <div align="center">
+      <img src="https://i.postimg.cc/tCWPKqYB/6-21.png" alt="Parte4-4" width="600" />
+   </div>
+
+      <div align="center">
+      <img src="https://i.postimg.cc/Cx48KcCD/6-22.png" alt="Parte4-5" width="600" />
+   </div>
+   
+      <div align="center">
+      <img src="https://i.postimg.cc/hGy7Lh5t/6-23.png" alt="Parte4-5" width="600" />
+   </div>
+5. **Uso de git revert y git reset**
+
+   - **Paso 1**: Simula la necesidad de revertir un commit en main debido a un error. Usa `git revert` para crear un commit que deshaga los cambios.
+     ```bash
+     $ git revert <commit_hash>
+     ```
+    <div align="center">
+      <img src="https://i.postimg.cc/Y9TGPZkc/6-24.png" alt="Parte4-6" width="600" />
+   </div>
+
+   - **Paso 2**: Realiza una prueba con `git reset --mixed` para entender cómo reestructurar el historial de commits sin perder los cambios no commiteados.
+     ```bash
+     $ git reset --mixed <commit_hash>
+     ```
+    <div align="center">
+      <img src="https://i.postimg.cc/3rDDG8C3/6-25.png" alt="Parte4-7" width="600" />
+   </div>
+   <div align="center">
+       <img src="https://i.postimg.cc/Vk4Swd1W/6-26.png" alt="Parte4-8" width="600" />
+    </div>
+
+6. **Versionado semántico y etiquetado**
+
+   - **Paso 1**: Aplica versionado semántico al proyecto utilizando tags para marcar versiones importantes.
+     ```bash
+     $ git tag -a v1.0.0 -m "Primera versión estable"
+     $ git push origin v1.0.0
+     ```
+         <div align="center">
+       <img src="https://i.postimg.cc/6p63MtR2/6-27.png" alt="Parte4-9" width="600" />
+    </div>
+
+7. **Aplicación de git bisect para depuración**
+
+   - **Paso 1**: Usa `git bisect` para identificar el commit que introdujo un error en el código.
+     ```bash
+     $ git bisect start
+     $ git bisect bad   # Indica que la versión actual tiene un error
+     $ git bisect good <último_commit_bueno>
+     # Continúa marcando como "good" o "bad" hasta encontrar el commit que introdujo el error
+     $ git bisect reset  # Salir del modo bisect
+     ```
+  --   Creamos una función para sumar dos números con 4 fases
+  <div align="center">
+       <img src="https://i.postimg.cc/9FQ5SM8h/6-31.png" alt="Parte4-12" width="600" />
+    </div>
+          <div align="center">
+       <img src="https://i.postimg.cc/V6PPHWTG/6-30.png" alt="Parte4-11" width="600" />
+    </div>
+     
+-- Usamos `git bisect` para identificar el commit que introdujo el error 
+   <div align="center">
+       <img src="https://i.postimg.cc/MTqrQPgS/6-32.png" alt="Parte4-13" width="600" />
+    </div>
+    
+ --  Corregimos el error
+   <div align="center">
+       <img src="https://i.postimg.cc/R0XwggN9/6-33.png" alt="Parte4-14" width="600" />
+     </div>
+    <div align="center">
+       <img src="https://i.postimg.cc/sxZSDyKD/6-34.png" alt="Parte4-14" width="600" />
+     </div>
+
+---
+#### **Preguntas**
+
+1. **Ejercicio para git checkout --ours y git checkout --theirs**
+
+   **Contexto**: En un sprint ágil, dos equipos están trabajando en diferentes ramas. Se produce un conflicto de fusión en un archivo de configuración crucial. El equipo A quiere mantener sus cambios mientras el equipo B solo quiere conservar los suyos. El proceso de entrega continua está detenido debido a este conflicto.
+
+   **Pregunta**:  
+   ¿Cómo utilizarías los comandos `git checkout --ours` y `git checkout --theirs` para resolver este conflicto de manera rápida y eficiente? Explica cuándo preferirías usar cada uno de estos comandos y cómo impacta en el pipeline de CI/CD. ¿Cómo te asegurarías de que la resolución elegida no comprometa la calidad del código?
+   
+ - Ante todo, esto se soluciona con una comunicacion continua en equipo, por ello, usaría `git checkout --ours` si quiero priorizar los cambios de mi rama actual en la que estoy trabajando y los cambios de la otra rama aun no son funcionales o no fueron probados. En cambio, `git checkout --theirs` para traer los cambios de la rama que estoy fusionando sabiendo que son correctos o si ya fueron validados por el otro equipo, aparte resolver el conflicto permite que el pipeline continúe su ejecución lo más antes posible. 
+ - Ejecutaria los tests del pipeline CI/CD para asegurarme de que la resolución elegida no comprometa la calidad del código y el flujo del pipeline se mantega estable. 
+
+2. **Ejercicio para git diff**
+
+   **Contexto**: Durante una revisión de código en un entorno ágil, se observa que un pull request tiene una gran cantidad de cambios, muchos de los cuales no están relacionados con la funcionalidad principal. Estos cambios podrían generar conflictos con otras ramas en la pipeline de CI/CD.
+
+   **Pregunta**:  
+   Utilizando el comando `git diff`, ¿cómo compararías los cambios entre ramas para identificar diferencias específicas en archivos críticos? Explica cómo podrías utilizar `git diff feature-branch..main` para detectar posibles conflictos antes de realizar una fusión y cómo esto contribuye a mantener la estabilidad en un entorno ágil con CI/CD.
+   
+ - Usando, por ejemplo, `git diff feature-branch..main`, que muestra una comparación línea por línea de los cambios entre `feature-branch` y `main`. Esto me permitiría detectar posibles conflictos antes de realizar la fusión y así evitar que se detenga el pipeline CI/CD de manera innecesaria por conflictos en la fusión que se pueden evitar.
+ 
+3. **Ejercicio para git merge --no-commit --no-ff**
+
+   **Contexto**: En un proyecto ágil con CI/CD, tu equipo quiere simular una fusión entre una rama de desarrollo y la rama principal para ver cómo se comporta el código sin comprometerlo inmediatamente en el repositorio. Esto es útil para identificar posibles problemas antes de completar la fusión.
+
+   **Pregunta**:  
+   Describe cómo usarías el comando `git merge --no-commit --no-ff` para simular una fusión en tu rama local. ¿Qué ventajas tiene esta práctica en un flujo de trabajo ágil con CI/CD, y cómo ayuda a minimizar errores antes de hacer commits definitivos? ¿Cómo automatizarías este paso dentro de una pipeline CI/CD?
+   
+  - Permite simular una fusión para ver qué sucederá, y esto es de gran ayuda, ya que nos evitaría conflictos y, en consecuencia, que se detenga el pipeline CI/CD. Para automatizar esto, crearía un job que realice esta fusión en un entorno aislado y ejecute pruebas, reportando los resultados sin alterar nuestro repositorio.
+
+4. **Ejercicio para git mergetool**
+
+   **Contexto**: Tu equipo de desarrollo utiliza herramientas gráficas para resolver conflictos de manera colaborativa. Algunos desarrolladores prefieren herramientas como vimdiff o Visual Studio Code. En medio de un sprint, varios archivos están en conflicto y los desarrolladores prefieren trabajar en un entorno visual para resolverlos.
+
+   **Pregunta**:  
+   Explica cómo configurarías y utilizarías `git mergetool` en tu equipo para integrar herramientas gráficas que faciliten la resolución de conflictos. ¿Qué impacto tiene el uso de `git mergetool` en un entorno de trabajo ágil con CI/CD, y cómo aseguras que todos los miembros del equipo mantengan consistencia en las resoluciones?
+
+- Para configurar `git mergetool`, usaría `git config --global merge.tool <herramienta>` para definir la herramienta preferida, en mi caso, vscode.  
+En CI/CD, `git mergetool` acelra la resolución de conflictos con interfaces visuales más sencillas de usar, reduciendo el tiempo de bloqueo en el pipeline.  
+Para mantener consistencia, podemos acordar en usar una herramienta estándar para todo el equipo y documentar nuestro proceso para reducir los conflictos de fusión.
+
+5. **Ejercicio para git reset**
+
+   **Contexto**: En un proyecto ágil, un desarrollador ha hecho un commit que rompe la pipeline de CI/CD. Se debe revertir el commit, pero se necesita hacerlo de manera que se mantenga el código en el directorio de trabajo sin deshacer los cambios.
+
+   **Pregunta**:  
+   Explica las diferencias entre `git reset --soft`, `git reset --mixed` y `git reset --hard`. ¿En qué escenarios dentro de un flujo de trabajo ágil con CI/CD utilizarías cada uno? Describe un caso en el que usarías `git reset --mixed` para corregir un commit sin perder los cambios no commiteados y cómo afecta esto a la pipeline.
+- `git reset --soft` deshace el commit, pero mantiene los cambios en el staging area (reorganizar commits).  
+`git reset --mixed` deshace el commit y los cambios en el staging area, pero quedan en nuestro directorio de trabajo (corregir commits).  
+`git reset --hard` elimina el commit y todos los cambios (situaciones críticas).  
+Si un commit rompe la pipeline, usaría `git reset --mixed HEAD~1` para deshacer el commit, conservando mis cambios y corrigiendo el error para posteriormente realizar un commit.
+
+
+6. **Ejercicio para git revert**
+
+   **Contexto**: En un entorno de CI/CD, tu equipo ha desplegado una característica a producción, pero se ha detectado un bug crítico. La rama principal debe revertirse para restaurar la estabilidad, pero no puedes modificar el historial de commits debido a las políticas del equipo.
+
+   **Pregunta**:  
+   Explica cómo utilizarías `git revert` para deshacer los cambios sin modificar el historial de commits. ¿Cómo te aseguras de que esta acción no afecte la pipeline de CI/CD y permita una rápida recuperación del sistema? Proporciona un ejemplo detallado de cómo revertirías varios commits consecutivos.
+-   Lo utilizaría de esta forma: `git revert <commit_hash>`, ya que es seguro usarlo en ramas compartidas debido a que no altera el historial, permitiéndome una eliminación limpia.
+    
+-   Para no afectar el CI/CD, me aseguraría de que todas las pruebas pasen exitosamente y comunicaría al equipo del revert. Para revertir múltiples commits consecutivos, usaría `git revert OLDEST_COMMIT^..NEWEST_COMMIT` y luego haría un único commit de reversión.
+7. **Ejercicio para git stash**
+
+   **Contexto**: En un entorno ágil, tu equipo está trabajando en una corrección de errores urgente mientras tienes cambios no guardados en tu directorio de trabajo que aún no están listos para ser committeados. Sin embargo, necesitas cambiar rápidamente a una rama de hotfix para trabajar en la corrección.
+
+   **Pregunta**:  
+   Explica cómo utilizarías `git stash` para guardar temporalmente tus cambios y volver a ellos después de haber terminado el hotfix. ¿Qué impacto tiene el uso de `git stash` en un flujo de trabajo ágil con CI/CD cuando trabajas en múltiples tareas? ¿Cómo podrías automatizar el proceso de *stashing* dentro de una pipeline CI/CD?
+- Para guardar mis cambios temporalmente, usaría `git stash save "descripción"`, luego cambiaría a la rama del hotfix con `git checkout hotfix`, y al terminar, volvería a mi rama de trabajo y recuperaría mis cambios con `git stash apply`.
+Para automatizar el proceso en CI/CD, crearía un script que detecte cambios locales antes de cambiar de rama y aplique stash automáticamente, guardando las referencias para recuperarlos después.
+
+8. **Ejercicio para .gitignore**
+
+   **Contexto**: Tu equipo de desarrollo ágil está trabajando en varios entornos locales con configuraciones diferentes (archivos de logs, configuraciones personales). Estos archivos no deberían ser parte del control de versiones para evitar confusiones en la pipeline de CI/CD.
+
+   **Pregunta**:  
+   Diseña un archivo `.gitignore` que excluya archivos innecesarios en un entorno ágil de desarrollo. Explica por qué es importante mantener este archivo actualizado en un equipo colaborativo que utiliza CI/CD y cómo afecta la calidad y limpieza del código compartido en el repositorio.
+  
+
+```
+# Archivos de editor de código
+.vscode/
+.idea/
+
+# Ignorar todos los archivos de log
+*.log
+
+# Ignorar archivos de configuración personal,local
+config/personal/
+.env
+*.env
+
+# Archivos de dependecias de Python
+__pycache__/
+*.pyc
+
+```
+Mantener actualizado el .gitignore es crucial porque evita que archivos irrelevantes saturen el repositorio, evita exponer datos sensibles, y previene conflictos innecesarios en CI/CD.
+
+---
+
+#### **Ejercicios adicionales**
+##### **Ejercicio 1: Resolución de conflictos en un entorno ágil**
+
+**Contexto:**  
+Estás trabajando en un proyecto ágil donde múltiples desarrolladores están enviando cambios a la rama principal cada día. Durante una integración continua, se detectan conflictos de fusión entre las ramas de dos equipos que están trabajando en dos funcionalidades críticas. Ambos equipos han modificado el mismo archivo de configuración del proyecto.
+
+**Pregunta:**  
+- ¿Cómo gestionarías la resolución de este conflicto de manera eficiente utilizando Git y manteniendo la entrega continua sin interrupciones? ¿Qué pasos seguirías para minimizar el impacto en la CI/CD y asegurar que el código final sea estable?
+-Usamos `git status` para detectar qué archivos están en conflicto y consultar a los desarrolladores de cada rama cuál fue el motivo de cada cambio, para solucionar los conflictos de la mejor forma posible y fusionar las ramas.  
+Para minimizar el impacto en CI/CD, debemos crear una rama `fix-merge` en la cual solucionemos el problema y luego integrarla a la rama principal, evitando así detener el pipeline CI/CD y asegurando que el código final sea estable.
+
+##### **Ejercicio 2: Rebase vs. Merge en integraciones ágiles**
+
+**Contexto:**  
+En tu equipo de desarrollo ágil, cada sprint incluye la integración de varias ramas de características. Algunos miembros del equipo prefieren realizar merge para mantener el historial completo de commits, mientras que otros prefieren rebase para mantener un historial lineal.
+
+**Pregunta:**  
+- ¿Qué ventajas y desventajas presenta cada enfoque (merge vs. rebase) en el contexto de la metodología ágil? ¿Cómo impacta esto en la revisión de código, CI/CD, y en la identificación rápida de errores?
+- Usar `git merge` permite mantener todo el historial de commits y ver claramente cuándo se integró cada rama. Es más seguro porque no reescribe el historial y ayuda a entender el contexto de cada integración. En cambio, `git rebase` reordena los commits para crear un historial más limpio y lineal, lo cual facilita revisar el código sin los commits de merge sin embargo hacerlo en una rama compartida puede traer conflictos complejos de resolver. En CI/CD con `merge` tenemos mayor trazabilidad para dectectar el error por integracion en cambio con `rebase` tenemos un historial limpio, fácil de revisar y detectar errores.
+
+##### **Ejercicio 3: Git Hooks en un flujo de trabajo CI/CD ágil**
+
+**Contexto:**  
+Tu equipo está utilizando Git y una pipeline de CI/CD que incluye tests unitarios, integración continua y despliegues automatizados. Sin embargo, algunos desarrolladores accidentalmente comiten código que no pasa los tests locales o no sigue las convenciones de estilo definidas por el equipo.
+
+**Pregunta:**  
+- Diseña un conjunto de Git Hooks que ayudaría a mitigar estos problemas, integrando validaciones de estilo y tests automáticos antes de permitir los commits. Explica qué tipo de validaciones implementarías y cómo se relaciona esto con la calidad del código y la entrega continua en un entorno ágil.
+
+ Hook pre-commit
+```bash
+#!/bin/bash
+echo " Verificando estilo de código"
+
+# Verificar formato con black
+if ! black . --check; then
+    echo "El código no está formateado correctamente. Usa 'black .' para corregir."
+    exit 1
+fi
+
+# Verificar estilo con flake8
+if ! flake8 .; then
+    echo "Se encontraron errores de estilo con flake8."
+    exit 1
+fi
+
+echo "Estilo correcto - Commit"
+```
+
+Hook pre-push
+```bash
+#!/bin/bash
+
+echo "Ejecutando tests antes del push"
+
+# Ejecutar pytest
+if ! pytest; then
+    echo "Los tests fallaron - Push cancelado"
+    exit 1
+fi
+
+echo "Los tests pasaron exitosamente - Push"
+```
+En un entorno ágil con CI/CD, esto es clave para sostener un flujo constante de entregas pequeñas, limpias y funcionales.
+
+
+##### **Ejercicio 4: Estrategias de branching en metodologías ágiles**
+
+**Contexto:**  
+Tu equipo de desarrollo sigue una metodología ágil y está utilizando Git Flow para gestionar el ciclo de vida de las ramas. Sin embargo, a medida que el equipo ha crecido, la gestión de las ramas se ha vuelto más compleja, lo que ha provocado retrasos en la integración y conflictos de fusión frecuentes.
+
+**Pregunta:**  
+- Explica cómo adaptarías o modificarías la estrategia de branching para optimizar el flujo de trabajo del equipo en un entorno ágil y con integración continua. Considera cómo podrías integrar feature branches, release branches y hotfix branches de manera que apoyen la entrega continua y minimicen conflictos.
+- Para optimizar el flujo en un entorno ágil con CI/CD, en Git Flow eliminaria ramas de release si no son necesarias y manteniendo ramas cortas de feature que se integren rápidamente. Usaría `develop` como rama base para features y `main` solo para versiones estables en producción. Las `feature branches` deben ser pequeñas, con cambios bien enfocados, y se integran rápido para evitar desviaciones largas. Las `hotfix branches` se crean directamente desde `main` y se integran tanto a `main` como a `develop` para mantener la sincronización.
+    <div align="center">
+       <img src="https://i.postimg.cc/ZR4M1bP3/6-35.png" alt="Parte5-1" width="600" />
+     </div>
+
+##### **Ejercicio 5: Automatización de reversiones con git en CI/CD**
+
+**Contexto:**  
+Durante una integración continua en tu pipeline de CI/CD, se detecta un bug crítico después de haber fusionado varios commits a la rama principal. El equipo necesita revertir los cambios rápidamente para mantener la estabilidad del sistema.
+
+**Pregunta:**  
+- ¿Cómo diseñarías un proceso automatizado con Git y CI/CD que permita revertir cambios de manera eficiente y segura? Describe cómo podrías integrar comandos como `git revert` o `git reset` en la pipeline y cuáles serían los pasos para garantizar que los bugs se reviertan sin afectar el desarrollo en curso.
+- Ante un bug crítico en la rama principal, usaría `git revert` para deshacer los commits sin reescribir el historial, ya que es más seguro en entornos colaborativos y CI/CD.  Automatizaría esto creando un job en el pipeline que pueda revertir automáticamente los últimos commits marcados como problemáticos.
+- Entonces primero se detecta el fallo tras el merge con test automáticos, se lanza el pipeline que ejecute el `git revert`, luego validamos los cambios revertidos con pruebas regresivas y se hace el push, finalmente lo comunicamos al equipo. No usaría  `git reset` ya que estamos en la rama principal y voy afectar su historial perjudicando a mi equipo, a menos, que el bug sea demasiado crítico y se requiera su uso.
+--- 
+
