@@ -1,0 +1,51 @@
+# archivos y carpetas de python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.egg-info/
+*.egg
+*.log
+
+# bytecode compilado por behave
+.features/steps/__pycache__/
+
+# archivos temporales de testing
+.cache/
+.tox/
+.pytest_cache/
+behave.log
+.coverage
+coverage.xml
+nosetests.xml
+
+# archivos de entorno virtual
+env/
+venv/
+ENV/
+.venv/
+act7/
+
+
+# archivos de confg locales
+*.vscode/
+.idea/
+*.swp
+*.swo
+
+# archivos de salida/depuracion
+debug.log
+*.bak
+
+# archivos de resultados html o informes de pruebas 
+htmlcov/
+dist/
+build/
+
+# archivos del so
+.DS_Store
+Thumbs.db
+
+# github actions temporales
+*.workflow
