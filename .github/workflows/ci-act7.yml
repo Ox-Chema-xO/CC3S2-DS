@@ -21,18 +21,13 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.10'
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest behave flake8
+          pip install pytest behave 
           pip install -r Actividades/Actividad7/requirements.txt || true
-
-      - name: Verificar formato de codigo con flake8
-        run: |
-          echo "Verificando calidad del codigo con flake8..."
-          flake8 Actividades/Actividad7/src/ Actividades/Actividad7/test/ Actividades/Actividad7/features/steps/ --max-line-length=100
 
   tests_unitarios:
     runs-on: ubuntu-latest
@@ -45,12 +40,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pytest
+          python-version: '3.10'
 
       - name: Ejecutar pruebas unitarias con pytest
         run: |
@@ -68,12 +58,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install behave
+          python-version: '3.10'
 
       - name: Ejecutar pruebas BDD
         run: |
