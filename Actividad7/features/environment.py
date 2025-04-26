@@ -2,9 +2,6 @@ from src.belly import Belly
 from unittest.mock import Mock
 
 def before_scenario(context, scenario):
-    context.belly = Belly()
-
-def before_scenario(context, scenario):
     clock_simulado = Mock()
     clock_simulado.return_value = "2025-02-22 12:00" 
     context.belly = Belly(clock_service=clock_simulado)

@@ -27,7 +27,6 @@ def test_estomago_no_gruñe_si_no_espera_suficiente():
     belly.esperar(1)
     assert belly.esta_gruñendo() == False
 
-
 def test_pepinos_comidos():
     belly = Belly()
     belly.comer(15)
@@ -43,7 +42,7 @@ def test_clock_simulado():
     clock_simulado.return_value = "2025-02-22 12:00"
 
     # "2025-02-22 10:00" como los 12 pepinos
-    belly = Belly(clock_service=clock_simulado)
+    belly = Belly(clock_simulado)
     belly.comer(12)
     belly.esperar(2)
 

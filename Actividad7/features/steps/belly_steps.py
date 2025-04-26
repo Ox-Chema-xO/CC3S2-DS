@@ -78,7 +78,6 @@ def convertir_tiempo_a_horas(time_description):
     return round(total_time_in_hours, 4)
 
 
-
 @given('que he comido {cukes:g} pepinos')
 def step_given_eaten_cukes(context, cukes):
     try: 
@@ -141,5 +140,4 @@ def step_then_verificar_faltantes(context, esperado):
 @then('deberia registrar la fecha actual 2025-02-22 12:00')
 def step_then_clock_simulado(context):
     fecha = context.belly.clock()
-    print(f"[DEBUG] fecha simulada: {fecha}")
     assert fecha == "2025-02-22 12:00"
