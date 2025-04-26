@@ -4,11 +4,11 @@ on:
   push:
     branches: [main]
     paths:
-      - 'Actividades/Actividad7/**'
+      - 'Actividad7/**'
   pull_request:
     branches: [main]
     paths:
-      - 'Actividades/Actividad7/**'
+      - 'Actividad7/**'
 
 jobs:
   build:
@@ -27,7 +27,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install pytest behave 
-          pip install -r Actividades/Actividad7/requirements.txt || true
+          pip install -r Actividad7/requirements.txt || true
 
   tests_unitarios:
     runs-on: ubuntu-latest
@@ -45,7 +45,7 @@ jobs:
       - name: Ejecutar pruebas unitarias con pytest
         run: |
           echo "Ejecutando pruebas unitarias..."
-          pytest Actividades/Actividad7/test/
+          pytest Actividad7/test/
 
   tests_bdd:
     runs-on: ubuntu-latest
@@ -63,4 +63,4 @@ jobs:
       - name: Ejecutar pruebas BDD
         run: |
           echo "Ejecutando pruebas BDD con behave..."
-          behave Actividades/Actividad7/features/ --no-capture --no-capture-stderr
+          behave Actividad7/features/ --no-capture --no-capture-stderr
