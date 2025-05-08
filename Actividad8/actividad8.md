@@ -62,7 +62,7 @@ def test_vaciar_items():
 ```
 Obteniendo los siguientes resultados:
  <div align="center">
-      <img src="https://i.postimg.cc/XNQSx8VS/8-1.png" alt="Parte1" width="600" />
+      <img src="https://i.postimg.cc/XNQSx8VS/8-1.png" alt="Parte1" width="800" />
     </div>
     
 ##### Ejercicio 2: Descuento por compra mínima
@@ -124,7 +124,9 @@ def test_dscto_condicional_fallido():
     assert total_a_pagar == 300.00
 ```
 Obteniendo los siguientes resultados:
-
+<div align="center">
+      <img src="https://i.postimg.cc/qqyjd9km/8-2.png" alt="Parte8-2" width="800" />
+    </div>
 
 ##### Ejercicio 3: Manejo de stock en producto
 Actualizamos la clase Producto para que incluya stock
@@ -208,7 +210,9 @@ def test_agregar_producto_fuera_de_stock():
         carrito.agregar_producto(producto, cantidad=8)
 ```
 Obteniendo los siguientes resultados:
-
+<div align="center">
+      <img src="https://i.postimg.cc/kXPTyXcL/8-3.png" alt="Parte8-3" width="800" />
+    </div>
 
 ##### Ejercicio 4: Ordenar items del carrito
 Agregamos un método `obtener_items_ordenados` en `Carrito` que utiliza la función `sorted()` con una función lambda para ordenar según el criterio elegido, para este caso nombre y precio.
@@ -242,7 +246,9 @@ def test_obtener_items_ordenados_por_criterio():
     assert [item.producto.precio for item in items_ordenados_por_precio] == [300.00, 400.00, 1300.00]
 ```
 Obteniendo los siguientes resultados:
-
+<div align="center">
+      <img src="https://i.postimg.cc/nhHT6RNk/8-4.png" alt="Parte8-4" width="800" />
+    </div>
 
 
 ##### Ejercicio 5: Uso de Pytest Fixtures
@@ -292,7 +298,9 @@ def test_agregar_producto_dentro_de_stock(carrito, producto_generico):
     assert item.cantidad == 5
 ```
 Obteniendo los siguientes resultados
-
+<div align="center">
+      <img src="https://i.postimg.cc/N0FD0ys2/8-5.png" alt="Parte8-5" width="800" />
+    </div>
 
 ##### Ejercicio 6: Pruebas parametrizadas
 Utilizaremos `@pytest.mark.parametrize` para verificar múltiples casos en un solo test, mantiendo un codigo mas limpio.
@@ -319,7 +327,9 @@ def test_dscto_condicional_varios_casos(
     assert total_a_pagar == esperado
 ```
 Obteniendo los siguientes resultados:
-
+<div align="center">
+      <img src="https://i.postimg.cc/6QP049qj/8-6.png" alt="Parte8-6" width="800" />
+    </div>
 
 ##### Ejercicio 7: Calcular impuestos en el carrito
 Implementaremos el método `calcular_impuestos(porcentaje)` para retornar  el valor del impuesto calculado sobre el total del carrito, siguiendo el flujo Red‑Green‑Refactor(RGR)
@@ -339,7 +349,10 @@ def test_calcular_impuestos(carrito, producto_generico):
     # Assert
     assert impuesto == 40.00
 ```
-
+<div align="center">
+      <img src="https://i.postimg.cc/MTkB8XvS/8-7-1.png" alt="Parte8-7-1" width="800" />
+    </div>
+    
 - **Green**: Modificaremos `carrito.py ` para que el test pase de la forma más sencilla posible.
 ```py
     def calcular_impuestos(self, porcentaje):
@@ -368,7 +381,9 @@ Agregamos documentacion y validacion de porcentaje en `carrito.py `
         return total * (porcentaje / 100)
 ```
 Obteniendo los siguientes resultados:
-
+<div align="center">
+      <img src="https://i.postimg.cc/2Ssy1Mmd/8-7-2.png" alt="Parte8-7-2" width="800" />
+    </div>
 
 
 ##### Ejercicio 8: Aplicar cupón de descuento con límite máximo
@@ -388,6 +403,10 @@ def test_aplicar_cupon_con_limite(carrito, producto_generico):
     # Assert
     assert total_con_cupon == 450.00
 ```
+<div align="center">
+      <img src="https://i.postimg.cc/65TpYtpL/8-8-1.png" alt="Parte8-8-1" width="800" />
+    </div>
+    
 - **Green**: Modificaremos `carrito.py ` para que el test pase de la forma más sencilla posible.
 ```py
 def aplicar_cupon(self, descuento_porcentaje, descuento_maximo):
@@ -424,6 +443,88 @@ Por ello agregamos documentacion y validacion de porcentaje en `carrito.py `
 ```
 Obteniendo los siguientes resultados:
  <div align="center">
-      <img src="https://i.postimg.cc/5t6xvLfB/8-8-2.png" alt="Parte8-2" width="600" />
+      <img src="https://i.postimg.cc/5t6xvLfB/8-8-2.png" alt="Parte8-8-2" width="800" />
     </div>
 
+##### Ejercicio 9: Validación de stock al agregar productos (RGR)
+Nos aseguraremos que al agregar un producto al carrito, no se exceda la cantidad disponible en stock usando el flujo RGR.
+- **Red**: Creamos un test que falle debido a que no cumplimos el nuevo requisito.
+```py
+def test_agregar_producto_excede_stock():
+    """
+    Red: Se espera que al intentar agregar una cantidad mayor a la disponible en stock se lance un ValueError.
+    """
+    # Arrange: Se crea un producto y un carrito
+    # Suponemos que el producto tiene 5 unidades en stock.
+    
+    producto = Producto("ProductoStock", 100.00, 5)
+    carrito = Carrito()
+
+    # Act & Assert
+    with pytest.raises(ValueError):
+        carrito.agregar_producto(producto, cantidad=6)
+```
+- **Green**: Modificaremos el método `agregar_producto` de `carrito.py ` para que el test pase de la forma más sencilla posible.
+```py
+    def agregar_producto(self, producto, cantidad):
+        """
+        Agrega un producto al carrito. Si el producto ya existe, incrementa la cantidad.
+        siempre y cuando la suma de cantidades no supere el stock del producto.
+        """
+        for item in self.items:
+            if item.producto.nombre == producto.nombre: 
+                if item.cantidad + cantidad > producto.stock:
+                    raise ValueError("No hay suficiente stock")
+                item.cantidad += cantidad
+                return
+        if cantidad > producto.stock:
+            raise ValueError("No hay suficiente stock")
+        self.items.append(ItemCarrito(producto, cantidad))
+```
+- **Refactor:**  
+   - Centralizaremos la validación del stock, creando un método `verificar_stock`que usaremos en `agregar_producto` 
+   - Documentaremos los métodos
+   
+   
+````py
+def verificar_stock(self, producto, cantidad):
+        """
+        Verifica si la cantidad a agregar supera el stock del producto, de ser asi lanza una excepcion,
+        en caso contrario retorna la cantidad actual del producto.
+        """
+        stock_actual = 0
+        cantidad_actual = 0
+        for item in self.items:
+            if item.producto.nombre == producto.nombre:
+                cantidad_actual = item.cantidad
+                stock_actual = producto.stock - cantidad_actual
+                if cantidad > stock_actual:
+                    raise ValueError(f"No hay suficiente stock, el stock actual del producto es {stock_actual}")
+                break
+        if cantidad > producto.stock:
+            raise ValueError(f"No hay suficiente stock, el stock actual del producto es {producto.stock}")
+        
+        return cantidad_actual
+                       
+def agregar_producto(self, producto, cantidad):
+    """
+    Agrega un producto al carrito. Si el producto ya existe, incrementa la cantidad.
+    siempre y cuando la suma de cantidades no supere el stock del producto.
+    """
+    cantidad_actual = self.verificar_stock(producto,cantidad)
+
+    for item in self.items:
+        if item.producto.nombre == producto.nombre:
+            nueva_cantidad = cantidad_actual + cantidad
+            self.actualizar_cantidad(producto, nueva_cantidad)
+            return
+    self.items.append(ItemCarrito(producto, cantidad))
+   ````
+   Obteniendo los siguientes resultados:
+   <div align="center">
+      <img src="https://i.postimg.cc/qMYMFStf/8-9-1.png" alt="Parte8-9-1" width="800" />
+    </div>
+   
+   <div align="center">
+      <img src="https://i.postimg.cc/W1kbc8rd/8-9-2.png" alt="Parte8-9-2" width="800" />
+    </div>
