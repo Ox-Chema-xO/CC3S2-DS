@@ -1,0 +1,25 @@
+# Byte-compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Entornos virtuales
+.venv/
+venv/
+env/
+act9/
+
+# Configuración de VSCode
+.vscode/
+
+# Pytest
+.pytest_cache/
+.cache
+
+# Archivos temporales y logs
+*.log
+*~
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
